@@ -613,80 +613,6 @@
         .action-btn.danger { border-color: #fff; color: #fff; }
         .action-btn.danger:hover { background: #fff; color: #000; box-shadow: 0 0 25px #fff; }
 
-        /* IDENTITY (COSPLAY) */
-        .identity-header {
-            text-align: center;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 30px;
-            position: relative;
-        }
-        
-        .identity-header::after {
-            content: 'PSYCHOLOGICAL_PROFILE_VISUALIZATION // GENDER_IDENTITY_STUDY';
-            position: absolute;
-            bottom: -12px; left: 50%;
-            transform: translateX(-50%);
-            background: #000;
-            padding: 0 15px;
-            color: #444;
-            font-size: 0.65rem;
-            font-family: 'Share Tech Mono';
-        }
-        
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .gallery-item {
-            position: relative;
-            aspect-ratio: 3/4;
-            border: 1px solid #333;
-            overflow: hidden;
-            background: #111;
-            transition: 0.5s;
-        }
-
-        .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 0.5s;
-            filter: grayscale(100%) contrast(1.2) brightness(0.7);
-        }
-
-        .gallery-item:hover {
-            border-color: var(--nerv-red);
-            box-shadow: 0 0 30px rgba(255,0,0,0.4);
-            transform: translateY(-8px);
-        }
-
-        .gallery-item:hover img {
-            filter: grayscale(0%) contrast(1.1) brightness(1);
-            transform: scale(1.08);
-        }
-
-        .gallery-info {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0,0,0,0.95);
-            padding: 15px;
-            transform: translateY(100%);
-            transition: 0.3s;
-            border-top: 3px solid var(--nerv-red);
-        }
-
-        .gallery-item:hover .gallery-info {
-            transform: translateY(0);
-        }
-        
-        .gallery-info h4 { color: var(--nerv-red); margin-bottom: 8px; font-family: 'Share Tech Mono'; font-size: 0.9rem; }
-        .gallery-info p { font-size: 0.75rem; color: #aaa; line-height: 1.4; }
-
         /* EMERGENCY OVERLAY */
         .emergency-overlay {
             position: fixed;
@@ -808,7 +734,6 @@
         <div class="nav-item active" onclick="switchPage('dashboard')" title="Dashboard">D</div>
         <div class="nav-item" onclick="switchPage('terminal')" title="Terminal">T</div>
         <div class="nav-item" onclick="switchPage('cockpit')" title="Cockpit">C</div>
-        <div class="nav-item" onclick="switchPage('identity')" title="Identity">I</div>
         <div class="nav-item" onclick="switchPage('protocol')" title="Protocol">P</div>
         <div class="nav-item" onclick="switchPage('personnel')" title="Personnel">P</div>
         <div class="nav-item" onclick="switchPage('missions')" title="Missions">M</div>
@@ -947,51 +872,6 @@
                         <button class="action-btn" id="btnSync" onmousedown="startSync()" onmouseup="stopSync()" ontouchstart="startSync()" ontouchend="stopSync()">INITIATE SYNC</button>
                         <button class="action-btn" onclick="resetSync()">RESET SYSTEM</button>
                         <button class="action-btn danger" style="grid-column: span 2;" onclick="emergencyEject()">EMERGENCY EJECT SEQUENCE</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- IDENTITY -->
-        <div id="page-identity" class="page">
-            <div class="identity-header">
-                <h2 style="font-size: 4rem; color: var(--nerv-red); letter-spacing: 8px; font-family: 'Playfair Display', serif;">IDENTITY_ARCHIVE</h2>
-                <p style="color: #666; margin-top: 20px; font-family: 'Share Tech Mono'; font-size: 0.8rem;">PSYCHOLOGICAL_PROFILE_VISUALIZATION // GENDER_IDENTITY_STUDY // SECTION_8_CLEARANCE</p>
-            </div>
-            <div class="gallery">
-                <div class="gallery-item">
-                    <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/163057793-38ec-43bb-9809-1ea15904e27f.png" alt="Identity 1">
-                    <div class="gallery-info">
-                        <h4>SUBJECT: UNKNOWN_VARIANT</h4>
-                        <p>Gender Fluid Expression // Plugsuit Modification // High Sync Potential // Psychological Stability: Moderate</p>
-                    </div>
-                </div>
-                <div class="gallery-item" style="background: #111; display: flex; align-items: center; justify-content: center; border: 2px dashed var(--nerv-red);">
-                    <div style="text-align: center; padding: 25px;">
-                        <h3 style="color: var(--nerv-red); font-family: 'Share Tech Mono'; font-size: 1.2rem;">UPLOAD_DATA</h3>
-                        <p style="font-size: 0.75rem; margin: 20px 0; color: #666; max-width: 220px;">Secure transfer to NERV servers. 256-bit encryption required. Section 8 approval needed.</p>
-                        <button style="background: var(--nerv-red); color: #000; border: none; padding: 12px 25px; cursor: pointer; font-family: 'Share Tech Mono'; font-weight: bold; font-size: 0.8rem;">SELECT FILE</button>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/18f3ecec0-4eb6-4ac0-b249-b1180f1b1901.png" alt="Identity 2">
-                    <div class="gallery-info">
-                        <h4>SUBJECT: AYANAMI_ALT_04</h4>
-                        <p>Cross-Dressing Archive // Vol. 4 // Psychological Stability: Low // Recommended: Therapy Session</p>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/15eb737af-3ad6-4abd-b2bf-443b7b782ef2.png" alt="Identity 3">
-                    <div class="gallery-info">
-                        <h4>SUBJECT: IKARI_SHINJI_03</h4>
-                        <p>Uniform Variant // Depression Indicators: Moderate // Sync Rate Impact: -5.2%</p>
-                    </div>
-                </div>
-                <div class="gallery-item">
-                    <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/1534a29ee-3b21-4a50-9e94-281bfbbe369b.png" alt="Identity 4">
-                    <div class="gallery-info">
-                        <h4>SUBJECT: SORYU_ASUKA_LANGLEY</h4>
-                        <p>Competitive Expression // Pride Indicators: High // Sync Rate Impact: +12.4%</p>
                     </div>
                 </div>
             </div>
@@ -1403,7 +1283,7 @@
             
             document.getElementById('page-' + pageId).classList.add('active');
             
-            const pages = ['dashboard', 'terminal', 'cockpit', 'identity', 'protocol', 'personnel', 'missions', 'equipment'];
+            const pages = ['dashboard', 'terminal', 'cockpit', 'protocol', 'personnel', 'missions', 'equipment'];
             const index = pages.indexOf(pageId);
             if (index !== -1) {
                 document.querySelectorAll('.nav-item')[index].classList.add('active');
