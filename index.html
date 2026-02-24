@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NERV // INTERNAL NETWORK // RESTRICTED ACCESS</title>
+    <title>NERV // INTERNAL NETWORK // RESTRICTED ACCESS // LEVEL 5</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap');
 
@@ -16,6 +16,7 @@
             --alert-orange: #ff9900;
             --eva-purple: #6a0dad;
             --scanline-color: rgba(0, 0, 0, 0.5);
+            --interface-bg: rgba(10, 10, 10, 0.95);
         }
 
         * {
@@ -34,8 +35,13 @@
             overflow: hidden;
             height: 100vh;
             display: grid;
-            grid-template-columns: 80px 1fr 300px;
-            grid-template-rows: 60px 1fr 40px;
+            grid-template-columns: 80px 1fr 320px;
+            grid-template-rows: 70px 1fr 50px;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(20,0,0,0.5) 0%, transparent 80%),
+                linear-gradient(0deg, transparent 24%, rgba(255, 0, 0, .05) 25%, rgba(255, 0, 0, .05) 26%, transparent 27%, transparent 74%, rgba(255, 0, 0, .05) 75%, rgba(255, 0, 0, .05) 76%, transparent 77%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(255, 0, 0, .05) 25%, rgba(255, 0, 0, .05) 26%, transparent 27%, transparent 74%, rgba(255, 0, 0, .05) 75%, rgba(255, 0, 0, .05) 76%, transparent 77%, transparent);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
         }
 
         /* CRT Overlay */
@@ -47,6 +53,7 @@
             pointer-events: none;
             z-index: 9999;
             animation: flicker 0.15s infinite;
+            mix-blend-mode: overlay;
         }
 
         @keyframes flicker {
@@ -58,77 +65,99 @@
         /* Layout Areas */
         header {
             grid-column: 1 / -1;
-            background: var(--nerv-black);
+            background: rgba(0,0,0,0.8);
             border-bottom: 2px solid var(--nerv-red);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 30px;
             z-index: 100;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 5px 20px rgba(255,0,0,0.2);
         }
 
         .logo-area {
             display: flex;
             align-items: flex-end;
-            gap: 10px;
+            gap: 15px;
         }
 
         .nerv-text {
-            font-family: 'Playfair Display', serif; /* Fallback if not loaded, but we use web safe */
-            font-size: 2.5rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
             font-weight: 900;
             color: var(--nerv-red);
             letter-spacing: -2px;
             line-height: 0.8;
+            text-shadow: 0 0 10px var(--nerv-red);
         }
 
         .nerv-slogan {
             display: flex;
             flex-direction: column;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--nerv-black);
             font-weight: bold;
-            line-height: 1.2;
+            line-height: 1.4;
+            margin-bottom: 5px;
         }
 
         .slogan-line {
             background-color: var(--nerv-red);
-            padding: 1px 5px;
+            padding: 2px 8px;
             transform: skewX(-20deg);
             white-space: nowrap;
+            box-shadow: 2px 2px 0px rgba(255,255,255,0.2);
         }
 
         .status-bar {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             font-family: 'Share Tech Mono', monospace;
             color: var(--terminal-green);
             font-size: 0.9rem;
+            text-align: right;
         }
 
         .status-item {
             border: 1px solid var(--terminal-green);
-            padding: 5px 10px;
-            background: rgba(57, 255, 20, 0.1);
+            padding: 5px 15px;
+            background: rgba(57, 255, 20, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(57,255,20,0.2), transparent);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         /* Sidebar Navigation */
         nav {
             grid-row: 2 / 3;
-            background: #0a0a0a;
+            background: #050505;
             border-right: 1px solid #333;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-top: 20px;
+            padding-top: 30px;
             z-index: 50;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
         }
 
         .nav-item {
             width: 50px;
             height: 50px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             border: 1px solid #333;
             display: flex;
             justify-content: center;
@@ -139,23 +168,25 @@
             transition: all 0.3s;
             cursor: pointer;
             position: relative;
-            background: #000;
+            background: #0a0a0a;
+            clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%);
         }
 
         .nav-item:hover, .nav-item.active {
             border-color: var(--nerv-red);
             color: var(--nerv-red);
             background: rgba(255, 0, 0, 0.1);
-            box-shadow: 0 0 10px var(--nerv-red);
+            box-shadow: 0 0 15px var(--nerv-red);
+            text-shadow: 0 0 5px var(--nerv-red);
         }
 
         .nav-item.active::before {
             content: '';
             position: absolute;
-            left: -1px;
+            left: 0;
             top: 0;
             bottom: 0;
-            width: 3px;
+            width: 4px;
             background: var(--nerv-red);
         }
 
@@ -165,8 +196,10 @@
             grid-row: 2 / 3;
             position: relative;
             overflow: hidden;
-            background: #000;
-            padding: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 30px;
+            border-left: 1px solid #222;
+            border-right: 1px solid #222;
         }
 
         .page {
@@ -176,7 +209,7 @@
             opacity: 0;
             transition: opacity 0.4s ease-in-out;
             overflow-y: auto;
-            padding: 20px;
+            padding: 10px;
         }
 
         .page.active {
@@ -189,44 +222,60 @@
         aside {
             grid-column: 3 / 4;
             grid-row: 2 / 3;
-            background: #0a0a0a;
+            background: #080808;
             border-left: 1px solid #333;
             padding: 20px;
             font-family: 'Share Tech Mono', monospace;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
         }
 
         .panel-box {
             border: 1px solid #333;
-            padding: 10px;
+            padding: 15px;
             background: rgba(255,255,255,0.02);
+            position: relative;
+        }
+        
+        .panel-box::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0;
+            width: 10px; height: 10px;
+            border-top: 1px solid var(--nerv-red);
+            border-right: 1px solid var(--nerv-red);
         }
 
         .panel-title {
             color: var(--nerv-red);
             border-bottom: 1px solid var(--nerv-red);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             padding-bottom: 5px;
             font-weight: bold;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
         }
 
         /* Footer */
         footer {
             grid-column: 1 / -1;
             grid-row: 3 / 4;
-            background: var(--nerv-black);
+            background: #000;
             border-top: 1px solid #333;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            padding: 0 30px;
             font-size: 0.7rem;
             color: #444;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
         /* --- PAGE SPECIFIC STYLES --- */
@@ -243,9 +292,16 @@
         .dash-card {
             border: 1px solid #333;
             background: rgba(0,0,0,0.8);
-            padding: 15px;
+            padding: 20px;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(5px);
+            transition: 0.3s;
+        }
+        
+        .dash-card:hover {
+            border-color: #666;
+            background: rgba(10,10,10,0.9);
         }
 
         .dash-card.large {
@@ -254,43 +310,88 @@
             background-size: cover;
             background-position: center;
             border: 1px solid var(--nerv-red);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+        }
+        
+        .dash-card.large::before {
+            content: '';
+            position: absolute;
+            top:0; left:0; right:0; bottom:0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.9) 100%);
         }
 
         .dash-card h3 {
             color: var(--nerv-red);
             font-family: 'Share Tech Mono', monospace;
-            margin-bottom: 10px;
-            background: rgba(0,0,0,0.7);
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.9);
             display: inline-block;
-            padding: 2px 5px;
+            padding: 5px 10px;
+            border: 1px solid var(--nerv-red);
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 0 5px var(--nerv-red);
         }
 
         .magi-system {
             display: flex;
             justify-content: space-around;
-            margin-top: 20px;
+            margin-top: 30px;
+            position: relative;
+            z-index: 2;
         }
 
         .magi-node {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             border: 2px solid #333;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: #333;
             transition: 0.3s;
             cursor: pointer;
+            background: #000;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .magi-node:hover {
+            transform: scale(1.1);
         }
 
         .magi-node.active {
             border-color: var(--terminal-green);
             color: var(--terminal-green);
-            box-shadow: 0 0 15px var(--terminal-green);
+            box-shadow: 0 0 20px var(--terminal-green), inset 0 0 10px var(--terminal-green);
+            text-shadow: 0 0 5px var(--terminal-green);
         }
+
+        .personnel-list {
+            list-style: none;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .personnel-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .dot-green { background: var(--terminal-green); box-shadow: 0 0 5px var(--terminal-green); }
+        .dot-orange { background: var(--alert-orange); box-shadow: 0 0 5px var(--alert-orange); }
+        .dot-red { background: var(--nerv-red); box-shadow: 0 0 5px var(--nerv-red); }
 
         /* TERMINAL (CHAT) */
         .terminal-container {
@@ -299,15 +400,18 @@
             height: 100%;
             border: 1px solid var(--terminal-green);
             background: #000;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.1);
         }
 
         .terminal-header {
             background: var(--terminal-green);
             color: #000;
-            padding: 5px 10px;
+            padding: 8px 15px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
+            font-family: 'Share Tech Mono', monospace;
+            letter-spacing: 1px;
         }
 
         .chat-window {
@@ -316,42 +420,68 @@
             overflow-y: auto;
             font-family: 'Share Tech Mono', monospace;
             color: var(--terminal-green);
+            background: 
+                linear-gradient(0deg, transparent 95%, rgba(57, 255, 20, 0.1) 95%),
+                linear-gradient(90deg, transparent 95%, rgba(57, 255, 20, 0.1) 95%);
+            background-size: 20px 20px;
         }
 
-        .chat-msg { margin-bottom: 8px; }
-        .chat-msg .user { color: #fff; font-weight: bold; }
-        .chat-msg .time { color: #666; font-size: 0.8em; margin-right: 5px; }
-        .chat-msg.system { color: var(--alert-orange); font-style: italic; }
+        .chat-msg { 
+            margin-bottom: 12px; 
+            padding: 8px;
+            border-left: 2px solid transparent;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-10px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .chat-msg.user { border-left-color: #fff; background: rgba(255,255,255,0.05); }
+        .chat-msg .user-name { color: #fff; font-weight: bold; }
+        .chat-msg .time { color: #666; font-size: 0.7em; margin-right: 10px; }
+        .chat-msg.system { color: var(--alert-orange); font-style: italic; border-left-color: var(--alert-orange); }
+        .chat-msg.nerve { color: var(--nerv-red); border-left-color: var(--nerv-red); font-weight: bold; }
 
         .chat-input-area {
             display: flex;
             border-top: 1px solid var(--terminal-green);
+            background: #050505;
         }
 
         .chat-input {
             flex: 1;
-            background: #000;
+            background: transparent;
             border: none;
             color: var(--terminal-green);
             padding: 15px;
             font-family: 'Share Tech Mono', monospace;
             outline: none;
+            font-size: 1rem;
         }
+
+        .chat-input::placeholder { color: rgba(57, 255, 20, 0.3); }
 
         .chat-send {
             background: var(--terminal-green);
             color: #000;
             border: none;
-            padding: 0 20px;
+            padding: 0 30px;
             font-weight: bold;
             cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            transition: 0.2s;
         }
+        
+        .chat-send:hover { background: #fff; }
 
         /* COCKPIT (TRAINING) */
         .cockpit-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 30px;
             height: 100%;
         }
 
@@ -359,12 +489,25 @@
             border: 1px solid var(--eva-purple);
             background: url('https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/163057793-38ec-43bb-9809-1ea15904e27f.png') center/cover no-repeat;
             position: relative;
+            box-shadow: 0 0 30px rgba(106, 13, 173, 0.2);
+        }
+        
+        .eva-visual::before {
+            content: 'ENTRY PLUG // INTERFACE HEADSET';
+            position: absolute;
+            top: 10px; left: 10px;
+            background: rgba(0,0,0,0.7);
+            color: var(--eva-purple);
+            padding: 5px;
+            font-family: 'Share Tech Mono';
+            font-size: 0.7rem;
+            border: 1px solid var(--eva-purple);
         }
 
         .eva-overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(106, 13, 173, 0.2);
+            background: radial-gradient(circle, transparent 20%, rgba(106, 13, 173, 0.4) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -372,40 +515,53 @@
         }
 
         .sync-circle {
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             border: 5px solid var(--eva-purple);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: bold;
             color: #fff;
-            text-shadow: 0 0 10px var(--eva-purple);
-            background: rgba(0,0,0,0.5);
-            box-shadow: 0 0 30px var(--eva-purple);
+            text-shadow: 0 0 20px var(--eva-purple);
+            background: rgba(0,0,0,0.6);
+            box-shadow: 0 0 50px var(--eva-purple), inset 0 0 30px var(--eva-purple);
+            position: relative;
         }
+        
+        .sync-circle::after {
+            content: '';
+            position: absolute;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border: 2px dashed rgba(106, 13, 173, 0.5);
+            border-radius: 50%;
+            animation: spin 10s linear infinite;
+        }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .controls-panel {
             border: 1px solid #333;
-            padding: 20px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 25px;
+            background: rgba(10,10,10,0.8);
         }
 
         .gauge-container {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
-        .gauge-label { display: flex; justify-content: space-between; margin-bottom: 5px; color: #aaa; }
-        .gauge-bar { height: 10px; background: #333; position: relative; }
-        .gauge-fill { height: 100%; background: var(--nerv-red); width: 0%; transition: width 0.2s; }
+        .gauge-label { display: flex; justify-content: space-between; margin-bottom: 8px; color: #aaa; font-family: 'Share Tech Mono'; font-size: 0.9rem; }
+        .gauge-bar { height: 12px; background: #222; position: relative; border: 1px solid #444; }
+        .gauge-fill { height: 100%; background: var(--nerv-red); width: 0%; transition: width 0.1s linear; box-shadow: 0 0 10px var(--nerv-red); }
 
         .btn-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 15px;
             margin-top: auto;
         }
 
@@ -413,30 +569,56 @@
             background: transparent;
             border: 1px solid var(--nerv-red);
             color: var(--nerv-red);
-            padding: 15px;
+            padding: 20px;
             font-family: 'Share Tech Mono', monospace;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
             transition: 0.2s;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,0,0,0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .action-btn:hover::before { left: 100%; }
 
-        .action-btn:hover { background: var(--nerv-red); color: #000; }
+        .action-btn:hover { background: var(--nerv-red); color: #000; box-shadow: 0 0 20px var(--nerv-red); }
         .action-btn.danger { border-color: #fff; color: #fff; }
-        .action-btn.danger:hover { background: #fff; color: #000; }
+        .action-btn.danger:hover { background: #fff; color: #000; box-shadow: 0 0 20px #fff; }
 
         /* IDENTITY (COSPLAY) */
         .identity-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             border-bottom: 1px solid #333;
-            padding-bottom: 20px;
+            padding-bottom: 30px;
+            position: relative;
+        }
+        
+        .identity-header::after {
+            content: 'PSYCHOLOGICAL_PROFILE_VISUALIZATION';
+            position: absolute;
+            bottom: -10px; left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            padding: 0 10px;
+            color: #444;
+            font-size: 0.7rem;
+            font-family: 'Share Tech Mono';
         }
         
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .gallery-item {
@@ -444,7 +626,8 @@
             aspect-ratio: 3/4;
             border: 1px solid #333;
             overflow: hidden;
-            group: ;
+            background: #111;
+            transition: 0.5s;
         }
 
         .gallery-item img {
@@ -452,12 +635,18 @@
             height: 100%;
             object-fit: cover;
             transition: 0.5s;
-            filter: grayscale(100%) contrast(1.2);
+            filter: grayscale(100%) contrast(1.2) brightness(0.8);
+        }
+
+        .gallery-item:hover {
+            border-color: var(--nerv-red);
+            box-shadow: 0 0 20px rgba(255,0,0,0.3);
+            transform: translateY(-5px);
         }
 
         .gallery-item:hover img {
-            filter: grayscale(0%) contrast(1);
-            transform: scale(1.1);
+            filter: grayscale(0%) contrast(1.1) brightness(1);
+            transform: scale(1.05);
         }
 
         .gallery-info {
@@ -465,16 +654,19 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: rgba(0,0,0,0.8);
-            padding: 10px;
+            background: rgba(0,0,0,0.9);
+            padding: 15px;
             transform: translateY(100%);
             transition: 0.3s;
-            border-top: 1px solid var(--nerv-red);
+            border-top: 2px solid var(--nerv-red);
         }
 
         .gallery-item:hover .gallery-info {
             transform: translateY(0);
         }
+        
+        .gallery-info h4 { color: var(--nerv-red); margin-bottom: 5px; font-family: 'Share Tech Mono'; }
+        .gallery-info p { font-size: 0.8rem; color: #aaa; }
 
         /* EMERGENCY OVERLAY */
         .emergency-overlay {
@@ -491,10 +683,19 @@
         }
 
         .emergency-text {
-            font-size: 5rem;
+            font-size: 6rem;
             font-weight: 900;
-            animation: blink 0.5s infinite;
+            animation: blink 0.4s infinite;
             text-align: center;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+        
+        .emergency-sub {
+            font-size: 2rem;
+            margin-top: 20px;
+            font-weight: bold;
+            letter-spacing: 5px;
         }
 
         @keyframes blink {
@@ -503,19 +704,45 @@
         }
 
         .emergency-btn {
-            margin-top: 50px;
-            padding: 20px 40px;
+            margin-top: 60px;
+            padding: 25px 50px;
             font-size: 2rem;
             background: #000;
             color: #fff;
             border: 4px solid #fff;
             cursor: pointer;
             font-family: 'Share Tech Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.2s;
+        }
+        
+        .emergency-btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        /* Decryption Mini-game */
+        .decrypt-box {
+            border: 1px solid var(--terminal-green);
+            padding: 20px;
+            margin-top: 20px;
+            background: #000;
+            color: var(--terminal-green);
+            font-family: 'Share Tech Mono';
+        }
+        .hex-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            opacity: 0.7;
         }
 
         /* Responsive */
-        @media (max-width: 1024px) {
-            body { grid-template-columns: 60px 1fr; grid-template-rows: 60px 1fr 40px; }
+        @media (max-width: 1200px) {
+            body { grid-template-columns: 60px 1fr; grid-template-rows: 60px 1fr 50px; }
             aside { display: none; }
             main { grid-column: 2 / 3; }
             .dashboard-grid { grid-template-columns: 1fr; }
@@ -531,8 +758,9 @@
     <!-- EMERGENCY OVERLAY -->
     <div class="emergency-overlay" id="emergencyOverlay">
         <div class="emergency-text">PATTERN BLUE<br>ANGEL DETECTED</div>
-        <div style="font-size: 1.5rem; margin-top: 20px;">ALL PERSONNEL TO BATTLE STATIONS</div>
-        <button class="emergency-btn" onclick="cancelEmergency()">CANCEL ALERT</button>
+        <div class="emergency-sub">ALL PERSONNEL TO BATTLE STATIONS</div>
+        <div style="margin-top: 30px; font-size: 1.2rem; border: 2px solid #000; padding: 10px;">DEFCON 1 // EVANGELION LAUNCH IMMINENT</div>
+        <button class="emergency-btn" onclick="cancelEmergency()">CANCEL ALERT // FALSE POSITIVE</button>
     </div>
 
     <!-- HEADER -->
@@ -546,7 +774,8 @@
         </div>
         <div class="status-bar">
             <div class="status-item">MAGI: ONLINE</div>
-            <div class="status-item">LCL: 98%</div>
+            <div class="status-item">LCL: 98.2%</div>
+            <div class="status-item">AT FIELD: STABLE</div>
             <div class="status-item" id="clock">00:00:00</div>
         </div>
     </header>
@@ -567,26 +796,31 @@
         <div id="page-dashboard" class="page active">
             <div class="dashboard-grid">
                 <div class="dash-card large">
-                    <h3>SYSTEM STATUS</h3>
-                    <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid var(--nerv-red);">
-                        <p>DEFCON: 3</p>
-                        <p>ANGEL PROBABILITY: 12%</p>
-                        <p>COMMANDER: GENDO IKARI</p>
+                    <h3>SYSTEM STATUS // TOKYO-3</h3>
+                    <div style="position: absolute; bottom: 30px; left: 30px; background: rgba(0,0,0,0.9); padding: 20px; border: 1px solid var(--nerv-red); width: 300px;">
+                        <p style="color: #fff; margin-bottom: 10px; font-family: 'Share Tech Mono';">DEFCON: <span style="color: var(--alert-orange)">3</span></p>
+                        <p style="color: #aaa; font-size: 0.8rem; margin-bottom: 5px;">ANGEL PROBABILITY</p>
+                        <div style="width: 100%; height: 4px; background: #333; margin-bottom: 15px;">
+                            <div style="width: 12%; height: 100%; background: var(--alert-orange);"></div>
+                        </div>
+                        <p style="color: #fff; margin-bottom: 10px; font-family: 'Share Tech Mono';">COMMANDER</p>
+                        <p style="color: var(--nerv-red); font-weight: bold;">GENDO IKARI</p>
+                        <p style="color: #666; font-size: 0.7rem; margin-top: 10px;">// RESTRICTED ACCESS LEVEL 5</p>
                     </div>
                 </div>
                 <div class="dash-card">
                     <h3>MAGI VOTE</h3>
-                    <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">Approve Instrumentality Project Phase 2?</p>
+                    <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px; line-height: 1.4;">Proposal 892: Approve Instrumentality Project Phase 2 funding?</p>
                     <div class="magi-system">
                         <div class="magi-node" onclick="voteMagi(this)">1</div>
                         <div class="magi-node" onclick="voteMagi(this)">2</div>
                         <div class="magi-node" onclick="voteMagi(this)">3</div>
                     </div>
-                    <div id="magi-result" style="margin-top: 15px; text-align: center; color: var(--terminal-green); display: none;">APPROVED</div>
+                    <div id="magi-result" style="margin-top: 20px; text-align: center; color: var(--terminal-green); display: none; font-weight: bold; letter-spacing: 2px;">APPROVED BY MAJORITY</div>
                 </div>
                 <div class="dash-card">
                     <h3>NEWS FEED</h3>
-                    <ul style="list-style: none; font-size: 0.8rem; color: #ccc; line-height: 1.8;">
+                    <ul style="list-style: none; font-size: 0.8rem; color: #ccc; line-height: 1.8;" id="newsFeed">
                         <li>> Unit-00 stability improved.</li>
                         <li>> Ritsuko requests more coffee.</li>
                         <li>> Misato's rent is overdue.</li>
@@ -595,24 +829,26 @@
                 </div>
                 <div class="dash-card">
                     <h3>PILOT STATUS</h3>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span>01 (Shinji)</span>
-                        <span style="color: var(--terminal-green)">SYNC: 42%</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span>00 (Rei)</span>
-                        <span style="color: var(--terminal-green)">SYNC: 38%</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>02 (Asuka)</span>
-                        <span style="color: var(--alert-orange)">SYNC: 85%</span>
-                    </div>
+                    <ul class="personnel-list">
+                        <li class="personnel-item">
+                            <span><span class="status-dot dot-green"></span>01 (Shinji)</span>
+                            <span style="color: var(--terminal-green)">SYNC: 42.8%</span>
+                        </li>
+                        <li class="personnel-item">
+                            <span><span class="status-dot dot-green"></span>00 (Rei)</span>
+                            <span style="color: var(--terminal-green)">SYNC: 38.1%</span>
+                        </li>
+                        <li class="personnel-item">
+                            <span><span class="status-dot dot-orange"></span>02 (Asuka)</span>
+                            <span style="color: var(--alert-orange)">SYNC: 85.4%</span>
+                        </li>
+                    </ul>
                 </div>
                 <div class="dash-card">
                     <h3>QUICK LINKS</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-                        <button class="action-btn" style="font-size: 0.7rem; padding: 10px;" onclick="switchPage('terminal')">CHAT</button>
-                        <button class="action-btn" style="font-size: 0.7rem; padding: 10px;" onclick="switchPage('cockpit')">TRAIN</button>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                        <button class="action-btn" style="font-size: 0.7rem; padding: 10px;" onclick="switchPage('terminal')">SECURE CHAT</button>
+                        <button class="action-btn" style="font-size: 0.7rem; padding: 10px;" onclick="switchPage('cockpit')">SYNC TEST</button>
                     </div>
                 </div>
             </div>
@@ -622,19 +858,20 @@
         <div id="page-terminal" class="page">
             <div class="terminal-container">
                 <div class="terminal-header">
-                    <span>SECURE CHANNEL: ALPHA</span>
-                    <span>ENCRYPTION: AES-256</span>
+                    <span>SECURE CHANNEL: ALPHA-7</span>
+                    <span>ENCRYPTION: AES-4096 // MAGI CORE</span>
                 </div>
                 <div class="chat-window" id="chatWindow">
-                    <div class="chat-msg system">> CONNECTION ESTABLISHED.</div>
-                    <div class="chat-msg system">> WELCOME, PILOT IKARI.</div>
-                    <div class="chat-msg"><span class="time">14:02</span><span class="user">Misato:</span> Shinji, don't forget to buy groceries on your way back.</div>
-                    <div class="chat-msg"><span class="time">14:05</span><span class="user">Ritsuko:</span> Sync data from yesterday looks promising. Come to the lab.</div>
-                    <div class="chat-msg"><span class="time">14:10</span><span class="user">Asuka:</span> Baka Shinji, why is your sync rate so low?</div>
+                    <div class="chat-msg system">> CONNECTION ESTABLISHED TO NERV LOCAL NETWORK.</div>
+                    <div class="chat-msg system">> HANDSHAKE COMPLETE. WELCOME, PILOT IKARI.</div>
+                    <div class="chat-msg nerve">> [ADMIN] Misato: Shinji, don't forget to buy groceries on your way back. And no beer this time.</div>
+                    <div class="chat-msg user"><span class="time">14:05</span><span class="user-name">Ritsuko:</span> Sync data from yesterday looks promising. Come to the lab when you're done.</div>
+                    <div class="chat-msg user"><span class="time">14:12</span><span class="user-name">Asuka:</span> Baka Shinji, why is your sync rate so low? Are you even trying?</div>
+                    <div class="chat-msg system">> [AUTO] User 'Kaji' has entered the channel.</div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="TYPE MESSAGE..." autocomplete="off">
-                    <button class="chat-send" onclick="sendChat()">SEND</button>
+                    <input type="text" class="chat-input" id="chatInput" placeholder="ENTER COMMAND OR MESSAGE..." autocomplete="off">
+                    <button class="chat-send" onclick="sendChat()">TRANSMIT</button>
                 </div>
             </div>
         </div>
@@ -645,34 +882,35 @@
                 <div class="eva-visual">
                     <div class="eva-overlay">
                         <div class="sync-circle" id="syncDisplay">00.0%</div>
-                        <div style="margin-top: 20px; color: #fff; font-family: 'Share Tech Mono'">NEURAL LINK STATUS</div>
+                        <div style="margin-top: 20px; color: #fff; font-family: 'Share Tech Mono'; text-shadow: 0 0 5px #fff;">NEURAL LINK STATUS</div>
+                        <div style="margin-top: 5px; color: var(--eva-purple); font-size: 0.8rem;">BLOOD TYPE: A // PATTERN: BLUE</div>
                     </div>
                 </div>
                 <div class="controls-panel">
-                    <h3 style="color: var(--eva-purple); border-bottom: 1px solid var(--eva-purple); padding-bottom: 10px;">SYNC TEST PROTOCOL</h3>
+                    <h3 style="color: var(--eva-purple); border-bottom: 1px solid var(--eva-purple); padding-bottom: 10px; font-family: 'Share Tech Mono';">SYNC TEST PROTOCOL // UNIT-01</h3>
                     
                     <div class="gauge-container">
-                        <div class="gauge-label"><span>HARMONIC</span><span id="val-harmonic">0%</span></div>
+                        <div class="gauge-label"><span>HARMONIC FREQUENCY</span><span id="val-harmonic">0%</span></div>
                         <div class="gauge-bar"><div class="gauge-fill" id="bar-harmonic"></div></div>
                     </div>
                     <div class="gauge-container">
-                        <div class="gauge-label"><span>NEURAL</span><span id="val-neural">0%</span></div>
+                        <div class="gauge-label"><span>NEURAL PATHWAY</span><span id="val-neural">0%</span></div>
                         <div class="gauge-bar"><div class="gauge-fill" id="bar-neural" style="background: var(--alert-orange)"></div></div>
                     </div>
                     <div class="gauge-container">
-                        <div class="gauge-label"><span>PULSE</span><span id="val-pulse">0%</span></div>
+                        <div class="gauge-label"><span>CARDIAC PULSE</span><span id="val-pulse">0%</span></div>
                         <div class="gauge-bar"><div class="gauge-fill" id="bar-pulse" style="background: var(--terminal-green)"></div></div>
                     </div>
 
-                    <div style="background: #111; padding: 10px; border: 1px solid #333; margin-top: 20px;">
-                        <p style="color: #aaa; font-size: 0.8rem;">INSTRUCTIONS:</p>
-                        <p style="color: #fff; font-size: 0.9rem;">Hold 'INITIATE SYNC' to increase neural connection. Release to stabilize. Do not exceed 400%.</p>
+                    <div style="background: #111; padding: 15px; border: 1px solid #333; margin-top: 20px; font-family: 'Share Tech Mono';">
+                        <p style="color: var(--nerv-red); font-size: 0.8rem; margin-bottom: 5px;">WARNING:</p>
+                        <p style="color: #aaa; font-size: 0.8rem; line-height: 1.4;">Hold 'INITIATE SYNC' to increase neural connection. Release to stabilize. Do not exceed 400% synchronization or Berserk Mode may trigger.</p>
                     </div>
 
                     <div class="btn-grid">
                         <button class="action-btn" id="btnSync" onmousedown="startSync()" onmouseup="stopSync()" ontouchstart="startSync()" ontouchend="stopSync()">INITIATE SYNC</button>
-                        <button class="action-btn" onclick="resetSync()">RESET</button>
-                        <button class="action-btn danger" style="grid-column: span 2;" onclick="emergencyEject()">EMERGENCY EJECT</button>
+                        <button class="action-btn" onclick="resetSync()">RESET SYSTEM</button>
+                        <button class="action-btn danger" style="grid-column: span 2;" onclick="emergencyEject()">EMERGENCY EJECT SEQUENCE</button>
                     </div>
                 </div>
             </div>
@@ -681,29 +919,36 @@
         <!-- IDENTITY -->
         <div id="page-identity" class="page">
             <div class="identity-header">
-                <h2 style="font-size: 3rem; color: var(--nerv-red); letter-spacing: 5px;">IDENTITY_ARCHIVE</h2>
-                <p style="color: #666; margin-top: 10px;">PSYCHOLOGICAL PROFILE // VISUAL REPRESENTATION</p>
+                <h2 style="font-size: 3.5rem; color: var(--nerv-red); letter-spacing: 5px; font-family: 'Playfair Display', serif;">IDENTITY_ARCHIVE</h2>
+                <p style="color: #666; margin-top: 15px; font-family: 'Share Tech Mono';">PSYCHOLOGICAL PROFILE // VISUAL REPRESENTATION // GENDER FLUIDITY STUDY</p>
             </div>
             <div class="gallery">
                 <div class="gallery-item">
                     <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/163057793-38ec-43bb-9809-1ea15904e27f.png" alt="Identity 1">
                     <div class="gallery-info">
                         <h4>SUBJECT: UNKNOWN</h4>
-                        <p>Gender Fluid // Plugsuit Variant</p>
+                        <p>Gender Fluid // Plugsuit Variant // High Sync Potential</p>
                     </div>
                 </div>
                 <div class="gallery-item" style="background: #111; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--nerv-red);">
                     <div style="text-align: center; padding: 20px;">
-                        <h3 style="color: var(--nerv-red);">UPLOAD_DATA</h3>
-                        <p style="font-size: 0.8rem; margin: 10px 0; color: #666;">Secure transfer to NERV servers.</p>
-                        <button style="background: var(--nerv-red); color: #000; border: none; padding: 10px 20px; cursor: pointer; font-family: 'Share Tech Mono';">SELECT FILE</button>
+                        <h3 style="color: var(--nerv-red); font-family: 'Share Tech Mono';">UPLOAD_DATA</h3>
+                        <p style="font-size: 0.8rem; margin: 15px 0; color: #666; max-width: 200px;">Secure transfer to NERV servers. Encryption required.</p>
+                        <button style="background: var(--nerv-red); color: #000; border: none; padding: 10px 20px; cursor: pointer; font-family: 'Share Tech Mono'; font-weight: bold;">SELECT FILE</button>
                     </div>
                 </div>
                 <div class="gallery-item">
                     <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/18f3ecec0-4eb6-4ac0-b249-b1180f1b1901.png" alt="Identity 2">
                     <div class="gallery-info">
                         <h4>SUBJECT: REI_ALT</h4>
-                        <p>Cross-Dressing Archive // Vol. 4</p>
+                        <p>Cross-Dressing Archive // Vol. 4 // Psychological Stability: Low</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/15eb737af-3ad6-4abd-b2bf-443b7b782ef2.png" alt="Identity 3">
+                    <div class="gallery-info">
+                        <h4>SUBJECT: SHINJI_03</h4>
+                        <p>Uniform Variant // Depression Indicators: Moderate</p>
                     </div>
                 </div>
             </div>
@@ -711,30 +956,42 @@
 
         <!-- PROTOCOL -->
         <div id="page-protocol" class="page">
-            <div style="max-width: 800px; margin: 0 auto; border: 1px solid #333; padding: 40px; background: #0a0a0a;">
-                <div style="text-align: center; border-bottom: 2px double var(--nerv-red); padding-bottom: 20px; margin-bottom: 30px;">
-                    <h1 style="font-size: 4rem; color: var(--nerv-red);">NERV</h1>
-                    <p>GOD'S IN HIS HEAVEN<br>ALL'S RIGHT WITH THE WORLD</p>
-                    <div style="border: 2px solid var(--nerv-red); color: var(--nerv-red); display: inline-block; padding: 5px 10px; margin-top: 10px; transform: rotate(-2deg);">TOP SECRET</div>
+            <div style="max-width: 800px; margin: 0 auto; border: 1px solid #333; padding: 50px; background: #0a0a0a; position: relative;">
+                <div style="position: absolute; top: 20px; right: 20px; opacity: 0.1; font-size: 5rem; font-weight: 900; color: #fff;">NERV</div>
+                
+                <div style="text-align: center; border-bottom: 2px double var(--nerv-red); padding-bottom: 30px; margin-bottom: 40px;">
+                    <h1 style="font-size: 5rem; color: var(--nerv-red); font-family: 'Playfair Display', serif; margin-bottom: 10px;">NERV</h1>
+                    <p style="font-family: 'Share Tech Mono'; letter-spacing: 2px;">GOD'S IN HIS HEAVEN<br>ALL'S RIGHT WITH THE WORLD</p>
+                    <div style="border: 2px solid var(--nerv-red); color: var(--nerv-red); display: inline-block; padding: 5px 15px; margin-top: 20px; transform: rotate(-2deg); font-weight: bold; font-family: 'Share Tech Mono';">TOP SECRET // EYES ONLY</div>
                 </div>
                 
-                <h3 style="color: var(--terminal-green); margin-bottom: 10px;">01. ORGANIZATION MANDATE</h3>
-                <p style="margin-bottom: 20px; line-height: 1.6; color: #ccc;">
-                    NERV is a paramilitary organization under the oversight of the United Nations. Its primary goal is the investigation, research, and destruction of the Angels, as well as the development and production of the Evangelions.
+                <h3 style="color: var(--terminal-green); margin-bottom: 15px; font-family: 'Share Tech Mono'; font-size: 1.2rem;">01. ORGANIZATION MANDATE</h3>
+                <p style="margin-bottom: 30px; line-height: 1.8; color: #ccc; text-align: justify;">
+                    NERV is a paramilitary organization under the oversight of the United Nations. Its primary goal is the investigation, research, and destruction of the Angels, as well as the development and production of the Evangelions. We are the shield of humanity.
                 </p>
 
-                <h3 style="color: var(--terminal-green); margin-bottom: 10px;">02. THE HEDGEHOG'S DILEMMA</h3>
-                <p style="margin-bottom: 20px; line-height: 1.6; color: #ccc;">
-                    Psychological profile indicates high risk of interpersonal trauma. Pilots are encouraged to maintain distance to avoid mutual harm, yet synchronization requires absolute emotional openness. This paradox is the core of the Eva project.
+                <h3 style="color: var(--terminal-green); margin-bottom: 15px; font-family: 'Share Tech Mono'; font-size: 1.2rem;">02. THE HEDGEHOG'S DILEMMA</h3>
+                <p style="margin-bottom: 30px; line-height: 1.8; color: #ccc; text-align: justify;">
+                    Psychological profile indicates high risk of interpersonal trauma. Pilots are encouraged to maintain distance to avoid mutual harm, yet synchronization requires absolute emotional openness. This paradox is the core of the Eva project. To know another is to hurt them.
                 </p>
 
-                <h3 style="color: var(--terminal-green); margin-bottom: 10px;">03. COMMUNITY GUIDELINES</h3>
-                <ul style="color: #ccc; line-height: 1.8; margin-left: 20px;">
+                <h3 style="color: var(--terminal-green); margin-bottom: 15px; font-family: 'Share Tech Mono'; font-size: 1.2rem;">03. COMMUNITY GUIDELINES</h3>
+                <ul style="color: #ccc; line-height: 2; margin-left: 20px; font-family: 'Share Tech Mono';">
                     <li>Do not discuss the Human Instrumentality Project in public channels.</li>
                     <li>Cross-dressing and identity exploration are permitted under Section 8 of the NERV charter regarding "Psychological Stability Maintenance".</li>
-                    <li>Sync rates below 40% will result in immediate discharge.</li>
+                    <li>Sync rates below 40% will result in immediate discharge or termination.</li>
                     <li>Do not feed the Angels.</li>
+                    <li>Remember: You are not alone. But you are still lonely.</li>
                 </ul>
+                
+                <div class="decrypt-box">
+                    <div style="border-bottom: 1px solid var(--terminal-green); padding-bottom: 5px; margin-bottom: 10px;">CLASSIFIED DATA DECRYPTION</div>
+                    <p>Enter access code to view Instrumentality details:</p>
+                    <input type="password" id="decryptInput" style="background: transparent; border: 1px solid var(--terminal-green); color: var(--terminal-green); padding: 5px; width: 150px; font-family: 'Share Tech Mono'; margin-top: 10px;">
+                    <button onclick="checkDecrypt()" style="background: var(--terminal-green); color: #000; border: none; padding: 5px 10px; font-family: 'Share Tech Mono'; cursor: pointer;">DECRYPT</button>
+                    <div id="decryptResult" style="margin-top: 10px; color: var(--nerv-red); display: none;">ACCESS DENIED. INCORRECT PASSCODE.</div>
+                    <div class="hex-grid" id="hexGrid"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -742,44 +999,58 @@
     <!-- RIGHT PANEL -->
     <aside>
         <div class="panel-box">
-            <div class="panel-title">SYSTEM LOGS</div>
-            <div id="systemLogs" style="font-size: 0.7rem; color: #666; height: 150px; overflow: hidden;">
+            <div class="panel-title">SYSTEM LOGS <span style="font-size: 0.6rem; opacity: 0.7;">LIVE</span></div>
+            <div id="systemLogs" style="font-size: 0.7rem; color: #666; height: 180px; overflow: hidden; font-family: 'Share Tech Mono';">
                 <div>> Boot sequence initiated...</div>
-                <div>> MAGI-01 online.</div>
-                <div>> MAGI-02 online.</div>
-                <div>> MAGI-03 online.</div>
+                <div>> MAGI-01 (MELCHIOR) online.</div>
+                <div>> MAGI-02 (BALTHASAR) online.</div>
+                <div>> MAGI-03 (CASPER) online.</div>
                 <div>> LCL levels nominal.</div>
+                <div>> AT Field generators standby.</div>
             </div>
         </div>
 
         <div class="panel-box">
             <div class="panel-title">ANGEL DETECTION</div>
             <div style="text-align: center; padding: 20px 0;">
-                <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/107207ef5-eab6-48b9-a461-45f596722df8.png" alt="Pattern Blue" style="width: 100px; opacity: 0.5;">
-                <div style="margin-top: 10px; color: var(--terminal-green);">STATUS: CLEAR</div>
+                <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/107207ef5-eab6-48b9-a461-45f596722df8.png" alt="Pattern Blue" style="width: 100px; opacity: 0.5; filter: hue-rotate(90deg);">
+                <div style="margin-top: 15px; color: var(--terminal-green); font-weight: bold; letter-spacing: 1px;">STATUS: CLEAR</div>
+                <div style="font-size: 0.6rem; color: #444; margin-top: 5px;">NO PATTERNS DETECTED</div>
             </div>
         </div>
 
         <div class="panel-box">
             <div class="panel-title">LCL STATUS</div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; font-family: 'Share Tech Mono';">
                 <span>O2 Level</span>
-                <span style="color: var(--terminal-green)">98%</span>
+                <span style="color: var(--terminal-green)">98.4%</span>
             </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; font-family: 'Share Tech Mono';">
                 <span>Pressure</span>
                 <span style="color: var(--terminal-green)">1.2 ATM</span>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; font-family: 'Share Tech Mono';">
                 <span>Temp</span>
                 <span style="color: var(--terminal-green)">37.0°C</span>
             </div>
+            <div style="margin-top: 15px; height: 40px; background: rgba(57,255,20,0.1); border: 1px solid var(--terminal-green); position: relative; overflow: hidden;">
+                <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: rgba(57,255,20,0.3); animation: wave 2s infinite linear;"></div>
+            </div>
+            <div style="text-align: center; font-size: 0.6rem; color: var(--terminal-green); margin-top: 5px;">FLUID DYNAMICS</div>
+        </div>
+        
+        <div class="panel-box">
+            <div class="panel-title">QUOTE OF THE DAY</div>
+            <p style="font-style: italic; color: #888; font-size: 0.8rem; line-height: 1.4;">"I mustn't run away. I mustn't run away. I mustn't run away."</p>
+            <p style="text-align: right; color: #666; font-size: 0.7rem; margin-top: 10px;">- S. Ikari</p>
         </div>
     </aside>
 
     <!-- FOOTER -->
     <footer>
-        CONFIDENTIAL // NERV INTERNAL NETWORK // UNAUTHORIZED ACCESS IS PUNISHABLE BY DEATH
+        <div>CONFIDENTIAL // NERV INTERNAL NETWORK</div>
+        <div>UNAUTHORIZED ACCESS IS PUNISHABLE BY DEATH</div>
+        <div>© 2015 NERV</div>
     </footer>
 
     <script>
@@ -796,7 +1067,6 @@
             
             document.getElementById('page-' + pageId).classList.add('active');
             
-            // Find nav item index
             const pages = ['dashboard', 'terminal', 'cockpit', 'identity', 'protocol'];
             const index = pages.indexOf(pageId);
             if (index !== -1) {
@@ -804,6 +1074,12 @@
             }
 
             addLog(`ACCESSING ${pageId.toUpperCase()} MODULE...`);
+            
+            if(pageId === 'protocol') {
+                startHexGrid();
+            } else {
+                stopHexGrid();
+            }
         }
 
         // Chat
@@ -816,8 +1092,8 @@
 
             const time = new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
             const msgDiv = document.createElement('div');
-            msgDiv.className = 'chat-msg';
-            msgDiv.innerHTML = `<span class="time">${time}</span><span class="user">YOU:</span> ${text}`;
+            msgDiv.className = 'chat-msg user';
+            msgDiv.innerHTML = `<span class="time">${time}</span><span class="user-name">YOU:</span> ${text}`;
             chatWindow.appendChild(msgDiv);
             chatInput.value = '';
             chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -829,15 +1105,17 @@
                     "Sync rate holding steady.",
                     "Commander Ikari is watching.",
                     "Don't run away.",
-                    "Data received."
+                    "Data received.",
+                    "Please remain calm.",
+                    "LCL levels normal."
                 ];
                 const reply = replies[Math.floor(Math.random() * replies.length)];
                 const replyDiv = document.createElement('div');
-                replyDiv.className = 'chat-msg';
-                replyDiv.innerHTML = `<span class="time">${time}</span><span class="user" style="color: var(--terminal-green)">SYSTEM:</span> ${reply}`;
+                replyDiv.className = 'chat-msg nerve';
+                replyDiv.innerHTML = `<span class="time">${time}</span><span class="user-name">SYSTEM:</span> ${reply}`;
                 chatWindow.appendChild(replyDiv);
                 chatWindow.scrollTop = chatWindow.scrollHeight;
-            }, 1500);
+            }, 1500 + Math.random() * 2000);
         }
 
         chatInput.addEventListener('keypress', (e) => {
@@ -850,9 +1128,16 @@
             if (el.classList.contains('active')) return;
             el.classList.add('active');
             votes++;
+            addLog(`MAGI-${el.innerText} VOTE CAST: APPROVE`);
             if (votes >= 2) {
                 document.getElementById('magi-result').style.display = 'block';
                 addLog("MAGI SYSTEM: DECISION REACHED. APPROVED.");
+                // Reset after 5 seconds
+                setTimeout(() => {
+                    document.querySelectorAll('.magi-node').forEach(n => n.classList.remove('active'));
+                    document.getElementById('magi-result').style.display = 'none';
+                    votes = 0;
+                }, 5000);
             }
         }
 
@@ -867,9 +1152,10 @@
             document.getElementById('btnSync').innerText = "SYNCING...";
             document.getElementById('btnSync').style.background = "var(--eva-purple)";
             document.getElementById('btnSync').style.color = "#fff";
+            addLog("NEURAL LINK INITIATED...");
 
             syncInterval = setInterval(() => {
-                syncValue += Math.random() * 2;
+                syncValue += Math.random() * 1.5;
                 if (syncValue > 100) syncValue = 100;
                 updateSyncUI();
             }, 50);
@@ -885,7 +1171,7 @@
             // Decay
             const decay = setInterval(() => {
                 if (syncValue > 0) {
-                    syncValue -= 1;
+                    syncValue -= 0.5;
                     updateSyncUI();
                 } else {
                     clearInterval(decay);
@@ -897,6 +1183,7 @@
             stopSync();
             syncValue = 0;
             updateSyncUI();
+            addLog("SYNC TEST RESET.");
         }
 
         function updateSyncUI() {
@@ -916,26 +1203,38 @@
             document.getElementById('bar-pulse').style.width = pulse + '%';
             document.getElementById('val-pulse').innerText = pulse.toFixed(0) + '%';
 
-            if (syncValue >= 400) {
-                alert("BERSERK MODE ACTIVATED");
-                resetSync();
+            if (syncValue >= 100) {
+                addLog("WARNING: SYNC RATE CRITICAL.");
+                document.getElementById('syncDisplay').style.color = "var(--nerv-red)";
+                document.getElementById('syncDisplay').style.textShadow = "0 0 20px var(--nerv-red)";
+            } else {
+                document.getElementById('syncDisplay').style.color = "#fff";
+                document.getElementById('syncDisplay').style.textShadow = "0 0 20px var(--eva-purple)";
             }
         }
 
         function emergencyEject() {
             document.body.style.background = '#fff';
+            addLog("EMERGENCY EJECT SEQUENCE INITIATED.");
             setTimeout(() => {
                 document.body.style.background = 'var(--nerv-black)';
                 resetSync();
-                addLog("EMERGENCY EJECT SEQUENCE COMPLETE.");
-                alert("PILOT SAFETY CONFIRMED.\nEJECTION SUCCESSFUL.");
-            }, 100);
+                addLog("PILOT SAFETY CONFIRMED. EJECTION SUCCESSFUL.");
+                alert("PILOT SAFETY CONFIRMED.\nEJECTION SUCCESSFUL.\nWELCOME BACK TO REALITY.");
+            }, 150);
         }
 
         // Emergency Alert
         function triggerEmergency() {
             document.getElementById('emergencyOverlay').style.display = 'flex';
             addLog("WARNING: PATTERN BLUE DETECTED.");
+            // Play sound effect simulation via visual flash
+            let flashCount = 0;
+            const flashInterval = setInterval(() => {
+                document.getElementById('emergencyOverlay').style.background = flashCount % 2 === 0 ? 'var(--nerv-red)' : '#500000';
+                flashCount++;
+                if(flashCount > 10) clearInterval(flashInterval);
+            }, 100);
         }
 
         function cancelEmergency() {
@@ -950,10 +1249,87 @@
             const logEntry = document.createElement('div');
             logEntry.innerText = `[${time}] ${msg}`;
             logContainer.prepend(logEntry);
+            if (logContainer.children.length > 20) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
         }
+        
+        // News Feed Rotator
+        const newsItems = [
+            "> Unit-00 stability improved.",
+            "> Ritsuko requests more coffee.",
+            "> Misato's rent is overdue.",
+            "> SEELE meeting scheduled.",
+            "> PenPen ate the last egg.",
+            "> GeoFront security breach detected.",
+            "> LCL supply low in Sector 7."
+        ];
+        let newsIndex = 0;
+        setInterval(() => {
+            newsIndex = (newsIndex + 1) % newsItems.length;
+            const list = document.getElementById('newsFeed');
+            const newItem = document.createElement('li');
+            newItem.innerText = newsItems[newsIndex];
+            newItem.style.color = '#fff';
+            list.prepend(newItem);
+            if(list.children.length > 5) list.removeChild(list.lastChild);
+        }, 4000);
+
+        // Decryption Mini-game
+        function checkDecrypt() {
+            const input = document.getElementById('decryptInput').value;
+            const result = document.getElementById('decryptResult');
+            if(input.toLowerCase() === '1234' || input.toLowerCase() === 'misato') {
+                result.style.display = 'block';
+                result.style.color = 'var(--terminal-green)';
+                result.innerText = "ACCESS GRANTED. LOADING INSTRUMENTALITY DATA...";
+                addLog("CLASSIFIED DATA ACCESSED.");
+            } else {
+                result.style.display = 'block';
+                result.style.color = 'var(--nerv-red)';
+                result.innerText = "ACCESS DENIED. INCORRECT PASSCODE.";
+                addLog("FAILED DECRYPTION ATTEMPT.");
+            }
+        }
+        
+        // Hex Grid Animation
+        let hexInterval;
+        function startHexGrid() {
+            const grid = document.getElementById('hexGrid');
+            grid.innerHTML = '';
+            for(let i=0; i<64; i++) {
+                const span = document.createElement('span');
+                span.innerText = '0';
+                span.style.color = '#333';
+                grid.appendChild(span);
+            }
+            
+            hexInterval = setInterval(() => {
+                const chars = '0123456789ABCDEF';
+                const spans = grid.querySelectorAll('span');
+                const randomIdx = Math.floor(Math.random() * spans.length);
+                spans[randomIdx].innerText = chars[Math.floor(Math.random() * 16)];
+                spans[randomIdx].style.color = Math.random() > 0.9 ? 'var(--terminal-green)' : '#333';
+            }, 50);
+        }
+        
+        function stopHexGrid() {
+            clearInterval(hexInterval);
+        }
+
+        // LCL Wave Animation CSS injection
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes wave {
+                0% { transform: translateX(-100%) skewX(-10deg); }
+                100% { transform: translateX(100%) skewX(-10deg); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
 
         // Init
         addLog("SYSTEM READY.");
+        startHexGrid();
     </script>
 </body>
 </html>
