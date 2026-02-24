@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NERV // INTERNAL NETWORK // RESTRICTED ACCESS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --nerv-red: #ff0000;
+            --nerv-black: #050505;
+            --nerv-dark-gray: #1a1a1a;
+            --nerv-white: #f0f0f0;
+            --terminal-green: #39ff14;
+            --alert-orange: #ff9900;
+            --eva-purple: #6a0dad;
+            --scanline-color: rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            cursor: crosshair;
+            scrollbar-width: thin;
+            scrollbar-color: var(--nerv-red) var(--nerv-black);
+        }
+
+        body {
+            background-color: var(--nerv-black);
+            color: var(--nerv-white);
+            font-family: 'Courier Prime', monospace;
+            overflow: hidden;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 80px 1fr 300px;
+            grid-template-rows: 60px 1fr 40px;
+        }
+
+        /* CRT Overlay */
+        .crt-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 9999;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            50% { opacity: 1; }
+            100% { opacity: 0.98; }
+        }
+
+        /* Layout Areas */
+        header {
+            grid-column: 1 / -1;
+            background: var(--nerv-black);
+            border-bottom: 2px solid var(--nerv-red);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .nerv-text {
+            font-family: 'Playfair Display', serif; /* Fallback if not loaded, but we use web safe */
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--nerv-red);
+            letter-spacing: -2px;
+            line-height: 0.8;
+        }
+
+        .nerv-slogan {
+            display: flex;
+            flex-direction: column;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--nerv-black);
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .slogan-line {
+            background-color: var(--nerv-red);
+            padding: 1px 5px;
+            transform: skewX(-20deg);
+            white-space: nowrap;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+        }
+
+        .status-item {
+            border: 1px solid var(--terminal-green);
+            padding: 5px 10px;
+            background: rgba(57, 255, 20, 0.1);
+        }
+
+        /* Sidebar Navigation */
+        nav {
+            grid-row: 2 / 3;
+            background: #0a0a0a;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            z-index: 50;
+        }
+
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.2rem;
+            color: #555;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            background: #000;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            border-color: var(--nerv-red);
+            color: var(--nerv-red);
+            background: rgba(255, 0, 0, 0.1);
+            box-shadow: 0 0 10px var(--nerv-red);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: -1px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--nerv-red);
+        }
+
+        /* Main Content */
+        main {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            padding: 20px;
+        }
+
+        .page {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            z-index: 10;
+        }
+
+        /* Right Panel (Info/Logs) */
+        aside {
+            grid-column: 3 / 4;
+            grid-row: 2 / 3;
+            background: #0a0a0a;
+            border-left: 1px solid #333;
+            padding: 20px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel-box {
+            border: 1px solid #333;
+            padding: 10px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .panel-title {
+            color: var(--nerv-red);
+            border-bottom: 1px solid var(--nerv-red);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Footer */
+        footer {
+            grid-column: 1 / -1;
+            grid-row: 3 / 4;
+            background: var(--nerv-black);
+            border-top: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: #444;
+            letter-spacing: 1px;
+        }
+
+        /* --- PAGE SPECIFIC STYLES --- */
+
+        /* DASHBOARD */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 20px;
+            height: 100%;
+        }
+
+        .dash-card {
+            border: 1px solid #333;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dash-card.large {
+            grid-column: span 2;
+            background-image: url('https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/181872ea9-52b9-415c-8602-91239654626a.png');
+            background-size: cover;
+            background-position: center;
+            border: 1px solid var(--nerv-red);
+        }
+
+        .dash-card h3 {
+            color: var(--nerv-red);
+            font-family: 'Share Tech Mono', monospace;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.7);
+            display: inline-block;
+            padding: 2px 5px;
+        }
+
+        .magi-system {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .magi-node {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #333;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .magi-node.active {
+            border-color: var(--terminal-green);
+            color: var(--terminal-green);
+            box-shadow: 0 0 15px var(--terminal-green);
+        }
+
+        /* TERMINAL (CHAT) */
+        .terminal-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            border: 1px solid var(--terminal-green);
+            background: #000;
+        }
+
+        .terminal-header {
+            background: var(--terminal-green);
+            color: #000;
+            padding: 5px 10px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chat-window {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--terminal-green);
+        }
+
+        .chat-msg { margin-bottom: 8px; }
+        .chat-msg .user { color: #fff; font-weight: bold; }
+        .chat-msg .time { color: #666; font-size: 0.8em; margin-right: 5px; }
+        .chat-msg.system { color: var(--alert-orange); font-style: italic; }
+
+        .chat-input-area {
+            display: flex;
+            border-top: 1px solid var(--terminal-green);
+        }
+
+        .chat-input {
+            flex: 1;
+            background: #000;
+            border: none;
+            color: var(--terminal-green);
+            padding: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            outline: none;
+        }
+
+        .chat-send {
+            background: var(--terminal-green);
+            color: #000;
+            border: none;
+            padding: 0 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* COCKPIT (TRAINING) */
+        .cockpit-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+
+        .eva-visual {
+            border: 1px solid var(--eva-purple);
+            background: url('https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/163057793-38ec-43bb-9809-1ea15904e27f.png') center/cover no-repeat;
+            position: relative;
+        }
+
+        .eva-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(106, 13, 173, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .sync-circle {
+            width: 200px;
+            height: 200px;
+            border: 5px solid var(--eva-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 10px var(--eva-purple);
+            background: rgba(0,0,0,0.5);
+            box-shadow: 0 0 30px var(--eva-purple);
+        }
+
+        .controls-panel {
+            border: 1px solid #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .gauge-container {
+            margin-bottom: 10px;
+        }
+        .gauge-label { display: flex; justify-content: space-between; margin-bottom: 5px; color: #aaa; }
+        .gauge-bar { height: 10px; background: #333; position: relative; }
+        .gauge-fill { height: 100%; background: var(--nerv-red); width: 0%; transition: width 0.2s; }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid var(--nerv-red);
+            color: var(--nerv-red);
+            padding: 15px;
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover { background: var(--nerv-red); color: #000; }
+        .action-btn.danger { border-color: #fff; color: #fff; }
+        .action-btn.danger:hover { background: #fff; color: #000; }
+
+        /* IDENTITY (COSPLAY) */
+        .identity-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 3/4;
+            border: 1px solid #333;
+            overflow: hidden;
+            group: ;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+            filter: grayscale(100%) contrast(1.2);
+        }
+
+        .gallery-item:hover img {
+            filter: grayscale(0%) contrast(1);
+            transform: scale(1.1);
+        }
+
+        .gallery-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            transform: translateY(100%);
+            transition: 0.3s;
+            border-top: 1px solid var(--nerv-red);
+        }
+
+        .gallery-item:hover .gallery-info {
+            transform: translateY(0);
+        }
+
+        /* EMERGENCY OVERLAY */
+        .emergency-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: var(--nerv-red);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .emergency-text {
+            font-size: 5rem;
+            font-weight: 900;
+            animation: blink 0.5s infinite;
+            text-align: center;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .emergency-btn {
+            margin-top: 50px;
+            padding: 20px 40px;
+            font-size: 2rem;
+            background: #000;
+            color: #fff;
+            border: 4px solid #fff;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            body { grid-template-columns: 60px 1fr; grid-template-rows: 60px 1fr 40px; }
+            aside { display: none; }
+            main { grid-column: 2 / 3; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .dash-card.large { grid-column: span 1; }
+            .cockpit-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="crt">
+
+    <div class="crt-overlay"></div>
+
+    <!-- EMERGENCY OVERLAY -->
+    <div class="emergency-overlay" id="emergencyOverlay">
+        <div class="emergency-text">PATTERN BLUE<br>ANGEL DETECTED</div>
+        <div style="font-size: 1.5rem; margin-top: 20px;">ALL PERSONNEL TO BATTLE STATIONS</div>
+        <button class="emergency-btn" onclick="cancelEmergency()">CANCEL ALERT</button>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-area">
+            <div class="nerv-text">NERV</div>
+            <div class="nerv-slogan">
+                <div class="slogan-line">God's In His Heaven</div>
+                <div class="slogan-line">All's Right With The World</div>
+            </div>
+        </div>
+        <div class="status-bar">
+            <div class="status-item">MAGI: ONLINE</div>
+            <div class="status-item">LCL: 98%</div>
+            <div class="status-item" id="clock">00:00:00</div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav>
+        <div class="nav-item active" onclick="switchPage('dashboard')" title="Dashboard">D</div>
+        <div class="nav-item" onclick="switchPage('terminal')" title="Terminal">T</div>
+        <div class="nav-item" onclick="switchPage('cockpit')" title="Cockpit">C</div>
+        <div class="nav-item" onclick="switchPage('identity')" title="Identity">I</div>
+        <div class="nav-item" onclick="switchPage('protocol')" title="Protocol">P</div>
+        <div class="nav-item" style="margin-top: auto; border-color: var(--alert-orange); color: var(--alert-orange);" onclick="triggerEmergency()" title="Emergency">!</div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page active">
+            <div class="dashboard-grid">
+                <div class="dash-card large">
+                    <h3>SYSTEM STATUS</h3>
+                    <div style="position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 10px; border: 1px solid var(--nerv-red);">
+                        <p>DEFCON: 3</p>
+                        <p>ANGEL PROBABILITY: 12%</p>
+                        <p>COMMANDER: GENDO IKARI</p>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <h3>MAGI VOTE</h3>
+                    <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">Approve Instrumentality Project Phase 2?</p>
+                    <div class="magi-system">
+                        <div class="magi-node" onclick="voteMagi(this)">1</div>
+                        <div class="magi-node" onclick="voteMagi(this)">2</div>
+                        <div class="magi-node" onclick="voteMagi(this)">3</div>
+                    </div>
+                    <div id="magi-result" style="margin-top: 15px; text-align: center; color: var(--terminal-green); display: none;">APPROVED</div>
+                </div>
+                <div class="dash-card">
+                    <h3>NEWS FEED</h3>
+                    <ul style="list-style: none; font-size: 0.8rem; color: #ccc; line-height: 1.8;">
+                        <li>> Unit-00 stability improved.</li>
+                        <li>> Ritsuko requests more coffee.</li>
+                        <li>> Misato's rent is overdue.</li>
+                        <li>> SEELE meeting scheduled.</li>
+                    </ul>
+                </div>
+                <div class="dash-card">
+                    <h3>PILOT STATUS</h3>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>01 (Shinji)</span>
+                        <span style="color: var(--terminal-green)">SYNC: 42%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>00 (Rei)</span>
+                        <span style="color: var(--terminal-green)">SYNC: 38%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>02 (Asuka)</span>
+                        <span style="color: var(--alert-orange)">SYNC: 85%</span>
+                    </div>
+                </div>
+                <div class="dash-card">
+                    <h3>QUICK LINKS</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                        <button class="action-btn" style="font-size: 0.7rem; padding: 10px;" onclick="switchPage('terminal')">CHAT</button>
+                        <button class="action-btn" style="font-size: 0.7rem; padding: 10px;" onclick="switchPage('cockpit')">TRAIN</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TERMINAL -->
+        <div id="page-terminal" class="page">
+            <div class="terminal-container">
+                <div class="terminal-header">
+                    <span>SECURE CHANNEL: ALPHA</span>
+                    <span>ENCRYPTION: AES-256</span>
+                </div>
+                <div class="chat-window" id="chatWindow">
+                    <div class="chat-msg system">> CONNECTION ESTABLISHED.</div>
+                    <div class="chat-msg system">> WELCOME, PILOT IKARI.</div>
+                    <div class="chat-msg"><span class="time">14:02</span><span class="user">Misato:</span> Shinji, don't forget to buy groceries on your way back.</div>
+                    <div class="chat-msg"><span class="time">14:05</span><span class="user">Ritsuko:</span> Sync data from yesterday looks promising. Come to the lab.</div>
+                    <div class="chat-msg"><span class="time">14:10</span><span class="user">Asuka:</span> Baka Shinji, why is your sync rate so low?</div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="TYPE MESSAGE..." autocomplete="off">
+                    <button class="chat-send" onclick="sendChat()">SEND</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COCKPIT -->
+        <div id="page-cockpit" class="page">
+            <div class="cockpit-layout">
+                <div class="eva-visual">
+                    <div class="eva-overlay">
+                        <div class="sync-circle" id="syncDisplay">00.0%</div>
+                        <div style="margin-top: 20px; color: #fff; font-family: 'Share Tech Mono'">NEURAL LINK STATUS</div>
+                    </div>
+                </div>
+                <div class="controls-panel">
+                    <h3 style="color: var(--eva-purple); border-bottom: 1px solid var(--eva-purple); padding-bottom: 10px;">SYNC TEST PROTOCOL</h3>
+                    
+                    <div class="gauge-container">
+                        <div class="gauge-label"><span>HARMONIC</span><span id="val-harmonic">0%</span></div>
+                        <div class="gauge-bar"><div class="gauge-fill" id="bar-harmonic"></div></div>
+                    </div>
+                    <div class="gauge-container">
+                        <div class="gauge-label"><span>NEURAL</span><span id="val-neural">0%</span></div>
+                        <div class="gauge-bar"><div class="gauge-fill" id="bar-neural" style="background: var(--alert-orange)"></div></div>
+                    </div>
+                    <div class="gauge-container">
+                        <div class="gauge-label"><span>PULSE</span><span id="val-pulse">0%</span></div>
+                        <div class="gauge-bar"><div class="gauge-fill" id="bar-pulse" style="background: var(--terminal-green)"></div></div>
+                    </div>
+
+                    <div style="background: #111; padding: 10px; border: 1px solid #333; margin-top: 20px;">
+                        <p style="color: #aaa; font-size: 0.8rem;">INSTRUCTIONS:</p>
+                        <p style="color: #fff; font-size: 0.9rem;">Hold 'INITIATE SYNC' to increase neural connection. Release to stabilize. Do not exceed 400%.</p>
+                    </div>
+
+                    <div class="btn-grid">
+                        <button class="action-btn" id="btnSync" onmousedown="startSync()" onmouseup="stopSync()" ontouchstart="startSync()" ontouchend="stopSync()">INITIATE SYNC</button>
+                        <button class="action-btn" onclick="resetSync()">RESET</button>
+                        <button class="action-btn danger" style="grid-column: span 2;" onclick="emergencyEject()">EMERGENCY EJECT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- IDENTITY -->
+        <div id="page-identity" class="page">
+            <div class="identity-header">
+                <h2 style="font-size: 3rem; color: var(--nerv-red); letter-spacing: 5px;">IDENTITY_ARCHIVE</h2>
+                <p style="color: #666; margin-top: 10px;">PSYCHOLOGICAL PROFILE // VISUAL REPRESENTATION</p>
+            </div>
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/163057793-38ec-43bb-9809-1ea15904e27f.png" alt="Identity 1">
+                    <div class="gallery-info">
+                        <h4>SUBJECT: UNKNOWN</h4>
+                        <p>Gender Fluid // Plugsuit Variant</p>
+                    </div>
+                </div>
+                <div class="gallery-item" style="background: #111; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--nerv-red);">
+                    <div style="text-align: center; padding: 20px;">
+                        <h3 style="color: var(--nerv-red);">UPLOAD_DATA</h3>
+                        <p style="font-size: 0.8rem; margin: 10px 0; color: #666;">Secure transfer to NERV servers.</p>
+                        <button style="background: var(--nerv-red); color: #000; border: none; padding: 10px 20px; cursor: pointer; font-family: 'Share Tech Mono';">SELECT FILE</button>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/18f3ecec0-4eb6-4ac0-b249-b1180f1b1901.png" alt="Identity 2">
+                    <div class="gallery-info">
+                        <h4>SUBJECT: REI_ALT</h4>
+                        <p>Cross-Dressing Archive // Vol. 4</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROTOCOL -->
+        <div id="page-protocol" class="page">
+            <div style="max-width: 800px; margin: 0 auto; border: 1px solid #333; padding: 40px; background: #0a0a0a;">
+                <div style="text-align: center; border-bottom: 2px double var(--nerv-red); padding-bottom: 20px; margin-bottom: 30px;">
+                    <h1 style="font-size: 4rem; color: var(--nerv-red);">NERV</h1>
+                    <p>GOD'S IN HIS HEAVEN<br>ALL'S RIGHT WITH THE WORLD</p>
+                    <div style="border: 2px solid var(--nerv-red); color: var(--nerv-red); display: inline-block; padding: 5px 10px; margin-top: 10px; transform: rotate(-2deg);">TOP SECRET</div>
+                </div>
+                
+                <h3 style="color: var(--terminal-green); margin-bottom: 10px;">01. ORGANIZATION MANDATE</h3>
+                <p style="margin-bottom: 20px; line-height: 1.6; color: #ccc;">
+                    NERV is a paramilitary organization under the oversight of the United Nations. Its primary goal is the investigation, research, and destruction of the Angels, as well as the development and production of the Evangelions.
+                </p>
+
+                <h3 style="color: var(--terminal-green); margin-bottom: 10px;">02. THE HEDGEHOG'S DILEMMA</h3>
+                <p style="margin-bottom: 20px; line-height: 1.6; color: #ccc;">
+                    Psychological profile indicates high risk of interpersonal trauma. Pilots are encouraged to maintain distance to avoid mutual harm, yet synchronization requires absolute emotional openness. This paradox is the core of the Eva project.
+                </p>
+
+                <h3 style="color: var(--terminal-green); margin-bottom: 10px;">03. COMMUNITY GUIDELINES</h3>
+                <ul style="color: #ccc; line-height: 1.8; margin-left: 20px;">
+                    <li>Do not discuss the Human Instrumentality Project in public channels.</li>
+                    <li>Cross-dressing and identity exploration are permitted under Section 8 of the NERV charter regarding "Psychological Stability Maintenance".</li>
+                    <li>Sync rates below 40% will result in immediate discharge.</li>
+                    <li>Do not feed the Angels.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <!-- RIGHT PANEL -->
+    <aside>
+        <div class="panel-box">
+            <div class="panel-title">SYSTEM LOGS</div>
+            <div id="systemLogs" style="font-size: 0.7rem; color: #666; height: 150px; overflow: hidden;">
+                <div>> Boot sequence initiated...</div>
+                <div>> MAGI-01 online.</div>
+                <div>> MAGI-02 online.</div>
+                <div>> MAGI-03 online.</div>
+                <div>> LCL levels nominal.</div>
+            </div>
+        </div>
+
+        <div class="panel-box">
+            <div class="panel-title">ANGEL DETECTION</div>
+            <div style="text-align: center; padding: 20px 0;">
+                <img src="https://image.qwenlm.ai/public_source/cbaa5fd1-4a61-4ca5-89d4-86b53e160245/107207ef5-eab6-48b9-a461-45f596722df8.png" alt="Pattern Blue" style="width: 100px; opacity: 0.5;">
+                <div style="margin-top: 10px; color: var(--terminal-green);">STATUS: CLEAR</div>
+            </div>
+        </div>
+
+        <div class="panel-box">
+            <div class="panel-title">LCL STATUS</div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem;">
+                <span>O2 Level</span>
+                <span style="color: var(--terminal-green)">98%</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem;">
+                <span>Pressure</span>
+                <span style="color: var(--terminal-green)">1.2 ATM</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                <span>Temp</span>
+                <span style="color: var(--terminal-green)">37.0°C</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- FOOTER -->
+    <footer>
+        CONFIDENTIAL // NERV INTERNAL NETWORK // UNAUTHORIZED ACCESS IS PUNISHABLE BY DEATH
+    </footer>
+
+    <script>
+        // Clock
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB');
+        }, 1000);
+
+        // Navigation
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            document.getElementById('page-' + pageId).classList.add('active');
+            
+            // Find nav item index
+            const pages = ['dashboard', 'terminal', 'cockpit', 'identity', 'protocol'];
+            const index = pages.indexOf(pageId);
+            if (index !== -1) {
+                document.querySelectorAll('.nav-item')[index].classList.add('active');
+            }
+
+            addLog(`ACCESSING ${pageId.toUpperCase()} MODULE...`);
+        }
+
+        // Chat
+        const chatWindow = document.getElementById('chatWindow');
+        const chatInput = document.getElementById('chatInput');
+
+        function sendChat() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            const time = new Date().toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-msg';
+            msgDiv.innerHTML = `<span class="time">${time}</span><span class="user">YOU:</span> ${text}`;
+            chatWindow.appendChild(msgDiv);
+            chatInput.value = '';
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            // Simulate reply
+            setTimeout(() => {
+                const replies = [
+                    "Acknowledged.",
+                    "Sync rate holding steady.",
+                    "Commander Ikari is watching.",
+                    "Don't run away.",
+                    "Data received."
+                ];
+                const reply = replies[Math.floor(Math.random() * replies.length)];
+                const replyDiv = document.createElement('div');
+                replyDiv.className = 'chat-msg';
+                replyDiv.innerHTML = `<span class="time">${time}</span><span class="user" style="color: var(--terminal-green)">SYSTEM:</span> ${reply}`;
+                chatWindow.appendChild(replyDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }, 1500);
+        }
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendChat();
+        });
+
+        // Magi Voting
+        let votes = 0;
+        function voteMagi(el) {
+            if (el.classList.contains('active')) return;
+            el.classList.add('active');
+            votes++;
+            if (votes >= 2) {
+                document.getElementById('magi-result').style.display = 'block';
+                addLog("MAGI SYSTEM: DECISION REACHED. APPROVED.");
+            }
+        }
+
+        // Sync Test
+        let syncInterval;
+        let syncValue = 0;
+        let isSyncing = false;
+
+        function startSync() {
+            if (isSyncing) return;
+            isSyncing = true;
+            document.getElementById('btnSync').innerText = "SYNCING...";
+            document.getElementById('btnSync').style.background = "var(--eva-purple)";
+            document.getElementById('btnSync').style.color = "#fff";
+
+            syncInterval = setInterval(() => {
+                syncValue += Math.random() * 2;
+                if (syncValue > 100) syncValue = 100;
+                updateSyncUI();
+            }, 50);
+        }
+
+        function stopSync() {
+            isSyncing = false;
+            clearInterval(syncInterval);
+            document.getElementById('btnSync').innerText = "INITIATE SYNC";
+            document.getElementById('btnSync').style.background = "transparent";
+            document.getElementById('btnSync').style.color = "var(--nerv-red)";
+            
+            // Decay
+            const decay = setInterval(() => {
+                if (syncValue > 0) {
+                    syncValue -= 1;
+                    updateSyncUI();
+                } else {
+                    clearInterval(decay);
+                }
+            }, 100);
+        }
+
+        function resetSync() {
+            stopSync();
+            syncValue = 0;
+            updateSyncUI();
+        }
+
+        function updateSyncUI() {
+            document.getElementById('syncDisplay').innerText = syncValue.toFixed(1) + '%';
+            
+            // Update gauges with some variance
+            const harmonic = Math.min(100, syncValue + (Math.random() * 10 - 5));
+            const neural = Math.min(100, syncValue * 0.9);
+            const pulse = Math.min(100, syncValue * 1.1);
+
+            document.getElementById('bar-harmonic').style.width = harmonic + '%';
+            document.getElementById('val-harmonic').innerText = harmonic.toFixed(0) + '%';
+            
+            document.getElementById('bar-neural').style.width = neural + '%';
+            document.getElementById('val-neural').innerText = neural.toFixed(0) + '%';
+
+            document.getElementById('bar-pulse').style.width = pulse + '%';
+            document.getElementById('val-pulse').innerText = pulse.toFixed(0) + '%';
+
+            if (syncValue >= 400) {
+                alert("BERSERK MODE ACTIVATED");
+                resetSync();
+            }
+        }
+
+        function emergencyEject() {
+            document.body.style.background = '#fff';
+            setTimeout(() => {
+                document.body.style.background = 'var(--nerv-black)';
+                resetSync();
+                addLog("EMERGENCY EJECT SEQUENCE COMPLETE.");
+                alert("PILOT SAFETY CONFIRMED.\nEJECTION SUCCESSFUL.");
+            }, 100);
+        }
+
+        // Emergency Alert
+        function triggerEmergency() {
+            document.getElementById('emergencyOverlay').style.display = 'flex';
+            addLog("WARNING: PATTERN BLUE DETECTED.");
+        }
+
+        function cancelEmergency() {
+            document.getElementById('emergencyOverlay').style.display = 'none';
+            addLog("ALL CLEAR. FALSE ALARM.");
+        }
+
+        // System Logs
+        function addLog(msg) {
+            const logContainer = document.getElementById('systemLogs');
+            const time = new Date().toLocaleTimeString('en-GB');
+            const logEntry = document.createElement('div');
+            logEntry.innerText = `[${time}] ${msg}`;
+            logContainer.prepend(logEntry);
+        }
+
+        // Init
+        addLog("SYSTEM READY.");
+    </script>
+</body>
+</html>
+
